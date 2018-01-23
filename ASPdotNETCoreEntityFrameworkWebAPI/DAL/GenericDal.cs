@@ -6,7 +6,7 @@ namespace ASPdotNETCoreEntityFrameworkWebAPI.DAL
 {
     public abstract class GenericDal<T> : IDataLayer<T> where T : class
     {
-        private EJournalContext dbContext;
+        protected EJournalContext dbContext;
 
         public GenericDal(EJournalContext dbContext)
         {

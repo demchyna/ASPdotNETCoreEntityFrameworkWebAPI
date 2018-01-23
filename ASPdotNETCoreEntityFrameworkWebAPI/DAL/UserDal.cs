@@ -11,5 +11,11 @@ namespace ASPdotNETCoreEntityFrameworkWebAPI.DAL
         public UserDal(EJournalContext dbContext) : base(dbContext)
         {
         }
+
+        public User GetByUsername(string username)
+        {
+            User user = dbContext.Users.Where(u => u.Username.Equals(username)).First();
+            return user;
+        }
     }
 }

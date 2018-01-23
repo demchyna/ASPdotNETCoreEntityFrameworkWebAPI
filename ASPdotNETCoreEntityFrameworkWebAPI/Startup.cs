@@ -10,6 +10,11 @@ using Microsoft.Extensions.Configuration;
 using ASPdotNETCoreEntityFrameworkWebAPI.DAL;
 using ASPdotNETCoreEntityFrameworkWebAPI.Entities;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using ASPdotNETCoreEntityFrameworkWebAPI.Security;
 
 namespace ASPdotNETCoreEntityFrameworkWebAPI
 {
@@ -34,6 +39,28 @@ namespace ASPdotNETCoreEntityFrameworkWebAPI
             services.AddSingleton<RoleDal>();
             services.AddSingleton<ArticleDal>();
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+
+                cfg.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+
+                    ValidateLifetime = true,
+
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AuthenticationOptions.SIGNING_KEY)),
+                    ValidateIssuerSigningKey = true
+                };
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("UserOnly", policy => policy.RequireClaim("Id"));
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
@@ -56,6 +83,8 @@ namespace ASPdotNETCoreEntityFrameworkWebAPI
                     name: "default",
                     template: "api/{controller}/{id?}");
             });
+
+            app.UseAuthentication();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

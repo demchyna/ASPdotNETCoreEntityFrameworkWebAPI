@@ -1,5 +1,7 @@
 ﻿using ASPdotNETCoreEntityFrameworkWebAPI.DAL;
 using ASPdotNETCoreEntityFrameworkWebAPI.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,8 +10,10 @@ using System.Threading.Tasks;
 
 namespace ASPdotNETCoreEntityFrameworkWebAPI.Controllers
 {
+    
     [Produces("application/json")]
     [Route("api/user")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : Controller
     {
         private UserDal userDal;
@@ -21,6 +25,7 @@ namespace ASPdotNETCoreEntityFrameworkWebAPI.Controllers
 
         [HttpGet]
         [Route("~/api/users")]
+        [Authorize(Roles = "admin")]
         public IEnumerable<User> GetAll()
         {
             return userDal.GetAll();
